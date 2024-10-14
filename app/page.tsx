@@ -1,101 +1,116 @@
-import Image from "next/image";
+/* eslint-disable @next/next/no-img-element */
+import { getDistance } from 'geolib';
+import Link from 'next/link';
 
-export default function Home() {
+export const formataLatELng = ({ lat, lng }: { lat: number, lng: number }) => ({latitude: lat, longitude: lng})
+
+const COORDENADAS_DE_CASA = {
+  lat: -23.6374,
+  lng: -46.4691
+}
+
+export type IRecords = {
+  docName: string | null
+  hdnImovel: string | null
+  dataInsercao: string | null
+  endereco: string | null
+  bairro: string | null
+  estado: string | null
+  cidade: string | null
+  tipoImovel: string | null
+  precoAvaliacao: number
+  precoVenda: number
+  desconto: number
+  modoVenda: string | null
+  situacao: string | null
+  aceitaFGTS: string | null
+  aceitaConsorcio: string | null
+  aceitaFinanciamentoHabitacional: string | null
+  aceitaParcelamento: string | null
+  temAcaoJudicial: string | null
+  coordenadas: {
+    lat: number,
+    lng: number
+  },
+  siteLeiloeiro: string | null,
+  vendedor: string | null,
+  origemIntegracao: string,
+  ativo: boolean,
+  imagens: Array<
+    {
+      order: number,
+      fileReference: string
+    } | never
+  >,
+  dataUltimaAtualizacao: string | null,
+  lancesDisputa: Array<{ value: number, date: string }>,
+  datasConcorrencias: Record<'leilao_unico' | 'leilao_2' | 'leilao_1', {
+    data_inicio: string | null,
+    data_fim: string | null,
+    local_leilao: string | null,
+    site_leiloeiro: string | null,
+    nome_leiloeiro: string | null,
+    lance_minimo: number | null,
+  }>
+}
+
+export type IResponseImoveis = {
+  count: number,
+  records: Array<IRecords | never>
+}
+
+export default async function Home() {
+  const imoveis = await fetch('https://smartleiloescaixa.com.br/api/imoveis/busca', {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "queryDataMode": "leilao",
+      "estados": ["SP"],
+      "max": 2400,
+      "offset": 0,
+      "countImoveis": true
+    }),
+  }).then(res => res.json()).then((res: IResponseImoveis) => res)
+  .catch((err: any) => ({ count: 0, records: [] }))
+
+  console.log({imoveis})
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+    <div>
+      <h1 className='text-xl px-4 py-2'>Imovéis em Sp</h1>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 px-4">
+        {imoveis?.records?.sort(({ coordenadas: coodeA }, { coordenadas: coodeB }) => {
+          if (coodeA?.lat && coodeA?.lng && coodeB?.lat && coodeB?.lng) {
+            return getDistance(
+              formataLatELng(COORDENADAS_DE_CASA),
+              formataLatELng(coodeA)
+            ) - getDistance(
+              formataLatELng(COORDENADAS_DE_CASA),
+              formataLatELng(coodeB)
+            )
+          } else {
+            return 0
+          }
+        })?.map(
+          ({ docName = '', cidade, estado, bairro, endereco, precoAvaliacao, precoVenda, imagens, lancesDisputa, datasConcorrencias, hdnImovel, origemIntegracao = '' }, idx: number) => (
+          <div key={`${docName} ${idx}`} className='space-y-2'>
+            <img className='w-[300px] max-h-[200px] object-cover' src={`https://storage.googleapis.com/imagens-imoveis-smart-leiloes/${imagens?.[0]?.fileReference ?? ''}`} alt='tet' />
+            <p>{docName}</p>
+            <p>{endereco} - {bairro}</p>
+            <p>{cidade} - {estado}</p>
+            <p><Link target='_blank' className='text-blue-500' href={`https://www.google.com/maps/place/${endereco?.split(' ').join('+')}`}>MAPS</Link></p>
+            <p><Link target='_blank' className='text-blue-500' href={`https://smartleiloescaixa.com.br/leilao/${hdnImovel}/${origemIntegracao}`}>Leilão</Link></p>
+            <p className='line-through text-xl'>{precoAvaliacao}</p>
+            {lancesDisputa?.length > 0 ? <p className='text-xl'>{lancesDisputa?.[0]?.value}</p> : <p className='text-xl'>{precoVenda}</p>}
+            <p className='text-sm'>Até {
+              datasConcorrencias?.leilao_unico?.data_fim ? datasConcorrencias?.leilao_unico?.data_fim
+              : datasConcorrencias?.leilao_2?.data_fim ? datasConcorrencias?.leilao_2?.data_fim
+              : datasConcorrencias?.leilao_1?.data_fim ? datasConcorrencias?.leilao_2?.data_fim : 0
+            }</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
