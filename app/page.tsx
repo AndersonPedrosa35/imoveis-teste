@@ -1,8 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { getDistance } from 'geolib';
 import Link from 'next/link';
-
-export const formataLatELng = ({ lat, lng }: { lat: number, lng: number }) => ({latitude: lat, longitude: lng})
+import { formataLatELng } from './utils';
 
 const COORDENADAS_DE_CASA = {
   lat: -23.6374,
