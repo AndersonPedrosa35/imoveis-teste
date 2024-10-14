@@ -72,7 +72,7 @@ export default async function Home() {
       "countImoveis": true
     }),
   }).then(res => res.json()).then((res: IResponseImoveis) => res)
-  .catch((err: any) => ({ count: 0, records: [] }))
+  .catch(() => ({ count: 0, records: [] }))
 
   console.log({imoveis})
   return (
